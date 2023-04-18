@@ -1,7 +1,12 @@
 import express from "express";
+import authRouter from "./route/auth/auth.controller";
 
-const app = express();
+export const app = express();
 const Port = 3000;
+
+app.use(express.json());
+
+app.use("/", authRouter);
 
 export const bootstrap = () => {
 	try {
