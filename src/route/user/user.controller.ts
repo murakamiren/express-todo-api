@@ -10,7 +10,7 @@ router.get("/", (req: Request, res: Response) => {
 
 	jwt.verify(bearerToken, "super-secret", (err, data) => {
 		if (err) {
-			return res.sendStatus(403);
+			return res.sendStatus(403).json({ msg: "no authorization" });
 		} else {
 			res.json({ msg: "success", payload: data });
 		}
