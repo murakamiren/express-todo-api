@@ -2,6 +2,7 @@ import { Response } from "express";
 import { SigninDto, SignupDto } from "./dto";
 import argon2 from "argon2";
 import { PrismaClient } from "@prisma/client";
+import jwt, { SignOptions } from "jsonwebtoken";
 
 const prisma = new PrismaClient();
 
@@ -16,9 +17,25 @@ const signup = async (res: Response, dto: SignupDto) => {
 				password: hashedPassword,
 			},
 		});
-		res.json({ user });
+
+		const payload = {
+			id: user.id,
+			name: user.name,
+			email: user.email,
+		};
+
+		const option: SignOptions = {
+			algorithm: "HS256",
+			expiresIn: "1h",
+		};
+
+		const token = jwt.sign(payload, "super-secret", option);
+		res.json({ user, token: token });
 	} catch (e) {
-		console.log(e);
+		if (e instanceof Error) {
+			console.log(e.message);
+			res.status(403).json({ message: e.message });
+		}
 	}
 };
 
@@ -36,7 +53,10 @@ const signin = async (res: Response, dto: SigninDto) => {
 
 		res.json({ user });
 	} catch (e) {
-		console.log(e);
+		if (e instanceof Error) {
+			console.log(e.message);
+			res.status(403).json({ message: e.message });
+		}
 	}
 };
 
