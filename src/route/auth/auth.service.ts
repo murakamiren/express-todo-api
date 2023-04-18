@@ -6,6 +6,7 @@ import jwt, { SignOptions } from "jsonwebtoken";
 import { HttpException } from "../../exception/httpException";
 import { signinValidator, signupValidator } from "./validator";
 import { prismaErrorHandler } from "../../util/prismaErrorHandler";
+import { JWT_SECRET_KEY } from "../../config/env";
 
 const prisma = new PrismaClient();
 
@@ -34,7 +35,7 @@ const signup = async (res: Response, next: NextFunction, dto: SignupDto) => {
 			expiresIn: "1h",
 		};
 
-		const token = jwt.sign(payload, "super-secret", option);
+		const token = jwt.sign(payload, JWT_SECRET_KEY, option);
 		res.json({ user, token: token });
 	} catch (e) {
 		if (e instanceof Prisma.PrismaClientKnownRequestError) {
