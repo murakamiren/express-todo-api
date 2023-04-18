@@ -5,7 +5,7 @@ import { SigninDto, SignupDto } from "./dto";
 const router = Router();
 
 router.post("/signup", (req: Request<SignupDto>, res: Response, next: NextFunction) => {
-	authService.signup(res, req.body);
+	authService.signup(res, next, req.body);
 });
 
 router.post("/signin", (req: Request<SigninDto>, res: Response, next: NextFunction) => {

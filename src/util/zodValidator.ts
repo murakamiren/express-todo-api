@@ -5,7 +5,7 @@ export const zodValidatior = async <T>(dto: T, schema: z.ZodType) => {
 	try {
 		const result = await schema.parseAsync(dto);
 
-		return result;
+		return result as T;
 	} catch (e) {
 		if (e instanceof z.ZodError) {
 			const { message } = e.issues[0];
