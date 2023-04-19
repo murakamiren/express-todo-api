@@ -1,16 +1,18 @@
 import express from "express";
-import authRouter from "./route/auth/auth.controller";
-import userRouter from "./route/user/user.controller";
+import { authorizationRouter, protectedRouter } from "./route";
 import { errorMiddleware } from "./middleware/error.middleware";
 import { PORT } from "./config/env";
+import { logger } from "./middleware/logger.middleware";
+import { verifyJwt } from "./middleware/jwt.middleware";
 
 export const app = express();
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(logger);
 
-app.use("/", authRouter);
-app.use("/user", userRouter);
+app.use("/", authorizationRouter);
+app.use("/", verifyJwt, protectedRouter);
 
 app.use(errorMiddleware);
 

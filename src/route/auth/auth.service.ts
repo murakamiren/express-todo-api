@@ -2,11 +2,10 @@ import { NextFunction, Response } from "express";
 import { SigninDto, SignupDto } from "./dto";
 import argon2 from "argon2";
 import { Prisma, PrismaClient } from "@prisma/client";
-import jwt, { SignOptions } from "jsonwebtoken";
 import { HttpException } from "../../exception/httpException";
 import { signinValidator, signupValidator } from "./validator";
-import { prismaErrorHandler } from "../../util/prismaErrorHandler";
-import { JWT_SECRET_KEY } from "../../config/env";
+import { TokenPayload, signJwt } from "../../middleware/jwt.middleware";
+import { prismaErrorException } from "../../exception/prismaErrorException";
 
 const prisma = new PrismaClient();
 
@@ -24,22 +23,13 @@ const signup = async (res: Response, next: NextFunction, dto: SignupDto) => {
 			},
 		});
 
-		const payload = {
-			id: user.id,
-			name: user.name,
-			email: user.email,
-		};
+		const payload: TokenPayload = { id: user.id, email: user.email };
 
-		const option: SignOptions = {
-			algorithm: "HS256",
-			expiresIn: "1h",
-		};
-
-		const token = jwt.sign(payload, JWT_SECRET_KEY, option);
+		const token = signJwt(payload);
 		res.json({ user, token: token });
 	} catch (e) {
 		if (e instanceof Prisma.PrismaClientKnownRequestError) {
-			const prismaError = prismaErrorHandler(e.code);
+			const prismaError = prismaErrorException(e.code);
 			next(prismaError);
 		} else {
 			next(e);
@@ -58,10 +48,12 @@ const signin = async (res: Response, next: NextFunction, dto: SigninDto) => {
 		if (user == null) throw new HttpException(400, "invalid email");
 
 		const verifyPassword = await argon2.verify(user.password, dto.password);
-
 		if (!verifyPassword) throw new HttpException(400, "invalid password");
 
-		res.json({ user });
+		const payload: TokenPayload = { id: user.id, email: user.email };
+		const token = signJwt(payload);
+
+		res.json({ user, token });
 	} catch (e) {
 		next(e);
 	}

@@ -1,6 +1,6 @@
-import { HttpException } from "../exception/httpException";
+import { HttpException } from "./httpException";
 
-export const prismaErrorHandler = (code: string) => {
+export const prismaErrorException = (code: string) => {
 	switch (code) {
 		case "P2002":
 			return new HttpException(400, "this email is already registered");
