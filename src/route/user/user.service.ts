@@ -1,6 +1,6 @@
 import { PrismaClient, User } from "@prisma/client";
 import { Response } from "express";
-import { exclude } from "../../util/exculde";
+import { exclude } from "../../util/exclude";
 
 const prisma = new PrismaClient();
 
