@@ -5,7 +5,7 @@ import userRouter from "./user/user.controller";
 export const authorizationRouter = Router();
 export const protectedRouter = Router();
 
-// not use jwt auth middleware
+// not use jwt guard middleware
 authorizationRouter.use("/auth", authRouter);
 
 // protected routes
