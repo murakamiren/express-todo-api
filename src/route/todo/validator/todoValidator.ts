@@ -6,6 +6,7 @@ const createTodoSchema = z
 	.object({
 		title: z
 			.string({ required_error: "title is required" })
+			.nonempty("title is required")
 			.max(16, { message: "title must be at most 16 characters" }),
 		desc: z.string().optional(),
 	})
