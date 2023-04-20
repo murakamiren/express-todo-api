@@ -1,9 +1,9 @@
 import { PrismaClient } from "@prisma/client";
 import { NextFunction, Response } from "express";
-import { CreateTodoDto } from "./dto";
+import { CreateTodoDto, UpdateTodoDto } from "./dto";
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime";
 import { prismaErrorException } from "../../exception/prismaErrorException";
-import { createTodoValidator } from "./validator/todoValidator";
+import { createTodoValidator, updateTodoValidator } from "./validator";
 
 const prisma = new PrismaClient();
 
@@ -44,7 +44,28 @@ const createTodo = async (res: Response, dto: CreateTodoDto, userId: number, nex
 	}
 };
 
+const updateTodo = async (res: Response, dto: UpdateTodoDto, userId: number, next: NextFunction) => {
+	try {
+		await updateTodoValidator(dto);
+
+		const updatedTodo = await prisma.todo.update({
+			where: {
+				id: dto.id,
+			},
+			data: {
+				title: dto.title,
+				desc: dto.desc,
+			},
+		});
+
+		res.json({ updatedTodo });
+	} catch (e) {
+		next(e);
+	}
+};
+
 export const todoService = {
 	getTodoList,
 	createTodo,
+	updateTodo,
 };
